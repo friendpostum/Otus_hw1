@@ -6,12 +6,14 @@ set(PROJECT_VESRION 0.0.${PATCH_VERSION})
 project(helloworld VERSION ${PROJECT_VESRION})
 
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
+find_package(GTest REQUIRED)
 
 configure_file(version.h.in version.h)
 
 add_executable(helloworld_cli main.cpp)
 add_library(helloworld lib.cpp)
 add_executable(test_version test_version.cpp)
+add_executable(gtest_version gtest_version.cpp)
 
 set_target_properties(helloworld_cli helloworld test_version PROPERTIES
     CXX_STANDARD 14
@@ -24,7 +26,11 @@ set_target_properties(test_version PROPERTIES
     COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
     INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR}
 )
-
+target_link_libraries(gtest_version
+        gtest
+        gtest_main
+        helloworld
+)
 target_link_libraries(helloworld_cli PRIVATE
     helloworld
 )
@@ -43,6 +49,9 @@ if (MSVC)
     target_compile_options(test_version PRIVATE
         /W4
     )
+    target_compile_options(test_version PRIVATE
+            /W4
+    )
 else ()
     target_compile_options(helloworld_cli PRIVATE
         -Wall -Wextra -pedantic -Werror
@@ -52,6 +61,9 @@ else ()
     )
     target_compile_options(test_version PRIVATE
         -Wall -Wextra -pedantic -Werror
+    )
+    target_compile_options(gtest_version PRIVATE
+            -Wall -Wextra -pedantic -Werror
     )
 endif()
 
@@ -72,3 +84,4 @@ include(CPack)
 enable_testing()
 
 add_test(test_version test_version)
+add_test(gtest_version gtest_version)
