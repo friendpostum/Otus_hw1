@@ -6,7 +6,14 @@ set(PROJECT_VESRION 0.0.${PATCH_VERSION})
 project(helloworld VERSION ${PROJECT_VESRION})
 
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
-find_package(GTest REQUIRED)
+
+include(FetchContent)
+FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG        release-1.10.0
+)
+FetchContent_MakeAvailable(googletest)
 
 configure_file(version.h.in version.h)
 
@@ -49,7 +56,7 @@ if (MSVC)
     target_compile_options(test_version PRIVATE
         /W4
     )
-    target_compile_options(test_version PRIVATE
+    target_compile_options(gtest_version PRIVATE
             /W4
     )
 else ()
